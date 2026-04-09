@@ -26,6 +26,8 @@ CSPropConductingSheet::CSPropConductingSheet(CSPropConductingSheet* prop, bool c
 	Init();
 	Conductivity.Copy(&prop->Conductivity);
 	Thickness.Copy(&prop->Thickness);
+	RoughnessSR.Copy(&prop->RoughnessSR);
+	RoughnessRF.Copy(&prop->RoughnessRF);
 }
 CSPropConductingSheet::CSPropConductingSheet(unsigned int ID, ParameterSet* paraSet) : CSPropMetal(ID,paraSet) {Type=(CSProperties::PropertyType)(CONDUCTINGSHEET | METAL);Init();}
 
@@ -38,6 +40,8 @@ void CSPropConductingSheet::Init()
 {
 	Conductivity.SetValue(0);
 	Thickness.SetValue(0);
+	RoughnessSR.SetValue(0);
+	RoughnessRF.SetValue(1.0);
 }
 
 
@@ -64,6 +68,26 @@ bool CSPropConductingSheet::Update(std::string *ErrStr)
 		PSErrorCode2Msg(EC,ErrStr);
 	}
 
+	EC=RoughnessSR.Evaluate();
+	if (EC!=ParameterScalar::PS_NO_ERROR) bOK=false;
+	if ((EC!=ParameterScalar::PS_NO_ERROR)  && (ErrStr!=NULL))
+	{
+		std::stringstream stream;
+		stream << std::endl << "Error in ConductingSheet-Property RoughnessSR-Value";
+		ErrStr->append(stream.str());
+		PSErrorCode2Msg(EC,ErrStr);
+	}
+
+	EC=RoughnessRF.Evaluate();
+	if (EC!=ParameterScalar::PS_NO_ERROR) bOK=false;
+	if ((EC!=ParameterScalar::PS_NO_ERROR)  && (ErrStr!=NULL))
+	{
+		std::stringstream stream;
+		stream << std::endl << "Error in ConductingSheet-Property RoughnessRF-Value";
+		ErrStr->append(stream.str());
+		PSErrorCode2Msg(EC,ErrStr);
+	}
+
 	return bOK & CSPropMetal::Update(ErrStr);
 }
 
@@ -75,6 +99,10 @@ bool CSPropConductingSheet::Write2XML(TiXmlNode& root, bool parameterised, bool 
 
 	WriteTerm(Conductivity,*prop,"Conductivity",parameterised);
 	WriteTerm(Thickness,*prop,"Thickness",parameterised);
+	if (RoughnessSR.GetValue() != 0)
+		WriteTerm(RoughnessSR,*prop,"RoughnessSR",parameterised);
+	if (RoughnessRF.GetValue() != 1.0)
+		WriteTerm(RoughnessRF,*prop,"RoughnessRF",parameterised);
 
 	return true;
 }
@@ -90,6 +118,8 @@ bool CSPropConductingSheet::ReadFromXML(TiXmlNode &root)
 		std::cerr << "CSPropConductingSheet::ReadFromXML: Warning: Failed to read Conductivity. Set to 0." << std::endl;
 	if (ReadTerm(Thickness,*prop,"Thickness")==false)
 		std::cerr << "CSPropConductingSheet::ReadFromXML: Warning: Failed to read Thickness. Set to 0." << std::endl;
+	ReadTerm(RoughnessSR,*prop,"RoughnessSR");
+	ReadTerm(RoughnessRF,*prop,"RoughnessRF");
 
 	return true;
 }
@@ -100,4 +130,8 @@ void CSPropConductingSheet::ShowPropertyStatus(std::ostream& stream)
 	stream << " --- Conducting Sheet Properties --- " << std::endl;
 	stream << "  Conductivity: " << Conductivity.GetValueString() << std::endl;
 	stream << "  Thickness: "   << Thickness.GetValueString() << std::endl;
+	if (RoughnessSR.GetValue() != 0)
+		stream << "  RoughnessSR: " << RoughnessSR.GetValueString() << " (Huray model)" << std::endl;
+	if (RoughnessRF.GetValue() != 1.0)
+		stream << "  RoughnessRF: " << RoughnessRF.GetValueString() << std::endl;
 }

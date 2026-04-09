@@ -57,6 +57,18 @@ public:
 	//! Get the Thickness as a string
 	const std::string GetThicknessTerm() {return Thickness.GetString();}
 
+	//! Set the RMS surface roughness height in meters (Huray model, default 0 = smooth)
+	void SetRoughnessSR(double val) {RoughnessSR.SetValue(val);}
+	int  SetRoughnessSR(const std::string val) {return RoughnessSR.SetValue(val);}
+	double GetRoughnessSR() {return RoughnessSR.GetValue();}
+	const std::string GetRoughnessSRTerm() {return RoughnessSR.GetString();}
+
+	//! Set the roughness factor (ratio of rough to smooth surface area, default 1.0 = smooth)
+	void SetRoughnessRF(double val) {RoughnessRF.SetValue(val);}
+	int  SetRoughnessRF(const std::string val) {return RoughnessRF.SetValue(val);}
+	double GetRoughnessRF() {return RoughnessRF.GetValue();}
+	const std::string GetRoughnessRFTerm() {return RoughnessRF.GetString();}
+
 	virtual bool Update(std::string *ErrStr=NULL);
 
 	virtual bool Write2XML(TiXmlNode& root, bool parameterised=true, bool sparse=false);
@@ -67,4 +79,6 @@ public:
 protected:
 	ParameterScalar Conductivity;
 	ParameterScalar Thickness;
+	ParameterScalar RoughnessSR;
+	ParameterScalar RoughnessRF;
 };
