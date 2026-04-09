@@ -111,9 +111,9 @@ void ContinuousStructure::RemoveProperty(CSProperties* prop)
 		if (*iter==prop)
 		{
 			vProperties.erase(iter);
+			this->UpdateIDs();
 			return;
 		}
-	this->UpdateIDs();
 }
 
 void ContinuousStructure::DeleteProperty(size_t index)
@@ -134,6 +134,7 @@ void ContinuousStructure::DeleteProperty(CSProperties* prop)
 		{
 			delete *iter;
 			vProperties.erase(iter);
+			break;
 		}
 	}
 	this->UpdateIDs();
